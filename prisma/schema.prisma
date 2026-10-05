@@ -1,0 +1,53 @@
+generator client {
+  provider = "prisma-client"
+  output   = "../server/generated/prisma"
+}
+
+datasource db {
+  provider = "postgresql"
+}
+
+model courses {
+  id      Int     @id @default(autoincrement())
+  name    String
+  user_id Int
+  tasks   tasks[]
+  user    users   @relation(fields: [user_id], references: [id], onDelete: NoAction, onUpdate: NoAction, map: "fk_courses_user")
+
+  @@unique([user_id, name])
+}
+
+/// The underlying table does not contain a valid unique identifier and can therefore currently not be handled by Prisma Client.
+model tasks {
+  id             Int              @id @default(autoincrement())
+  title          String?
+  completed      Boolean?
+  duration       Int?
+  course_id      Int
+  description    String?
+  date           DateTime?        @db.Date
+  time           DateTime?        @db.Time(6)
+  user_id        Int
+  study_sessions study_sessions[]
+  courses        courses          @relation(fields: [course_id], references: [id], onDelete: NoAction, onUpdate: NoAction, map: "fk_tasks_course")
+  users          users            @relation(fields: [user_id], references: [id], onDelete: NoAction, onUpdate: NoAction, map: "fk_tasks_user")
+}
+
+model study_sessions {
+  id         Int       @id @default(autoincrement())
+  task_id    Int
+  start_time DateTime  @db.Timestamp(6)
+  end_time   DateTime? @db.Timestamp(6)
+  duration   Int?
+  tasks      tasks     @relation(fields: [task_id], references: [id], onDelete: Cascade, onUpdate: NoAction)
+}
+
+model users {
+  id            Int       @id @default(autoincrement())
+  name          String
+  email         String    @unique
+  password_hash String
+  created_at    DateTime  @default(now())
+  tasks         tasks[]
+  courses       courses[]
+}

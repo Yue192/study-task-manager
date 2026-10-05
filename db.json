@@ -1,0 +1,35 @@
+{
+  "tasks": [
+    {
+      "id": "1",
+      "title": "学习 React Component",
+      "description": "复习组件的创建和使用方法",
+      "category": "React",
+      "date": "2026-07-22",
+      "time": "10:00",
+      "duration": 30,
+      "completed": false
+    },
+    {
+      "id": "2",
+      "title": "学习 TypeScript Props",
+      "description": "练习为组件的 Props 添加类型",
+      "category": "TypeScript",
+      "date": "2026-07-22",
+      "time": "11:00",
+      "duration": 30,
+      "completed": true
+    },
+    {
+      "id": "3",
+      "title": "制作任务管理器",
+      "description": "根据线框图升级原来的 React 项目",
+      "category": "Project",
+      "date": "2026-07-22",
+      "time": "13:00",
+      "duration": 60,
+      "completed": false
+    }
+  ],
+  "$schema": "./node_modules/json-server/schema.json"
+}
