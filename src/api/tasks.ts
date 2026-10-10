@@ -3,7 +3,7 @@ import type { Task } from "../types";
 export async function getTasks(): Promise<Task[]> {
 //   getTask()最终会返回Task[]
     const response = await fetch(
-    "http://localhost:3000/tasks",
+    "/tasks",
     {
       credentials: "include",
     }
@@ -24,7 +24,7 @@ export async function addTask(
   taskData: Omit<Task, "id" | "completed">
 ): Promise<Task> {
   const response = await fetch(
-    "http://localhost:3000/tasks",
+    "/tasks",
     {
       method: "POST",
       // POST/task
@@ -57,7 +57,7 @@ export async function addTask(
 
 export async function deleteTask(id: number): Promise<void> {
   const response = await fetch(
-    `http://localhost:3000/tasks/${id}`,
+    `/tasks/${id}`,
     {
       method: "DELETE",
       credentials: "include",
@@ -74,7 +74,7 @@ export async function updateTaskCompleted(
   completed: boolean
 ): Promise<Task> {
   const response = await fetch(
-    `http://localhost:3000/tasks/${id}`,
+    `/tasks/${id}`,
     {
       method: "PATCH",
       headers: {
@@ -111,7 +111,7 @@ export async function updateTask(
   taskData: UpdateTaskData
 ): Promise<Task> {
   const response = await fetch(
-    `http://localhost:3000/tasks/${id}`,
+    `/tasks/${id}`,
     {
       method: "PATCH",
       headers: {

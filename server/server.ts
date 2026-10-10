@@ -1,3 +1,5 @@
+import path from "node:path";
+import { fileURLToPath } from "node:url";
 import { prisma } from "./prisma";
 import express from "express";
 import type { NextFunction, Request, Response } from "express";
@@ -5,6 +7,7 @@ import cors from "cors";
 import * as argon2 from "argon2";
 import "dotenv/config";
 import session from "express-session";
+import connectPgSimple from "connect-pg-simple";
 
 declare module "express-session" {
   interface SessionData {
@@ -25,21 +28,37 @@ app.use(
 app.use(express.json());
 // 自动读取body里的json,转换为js对象放到req.body里
 
+const isProduction = process.env.NODE_ENV === "production";
 const sessionSecret = process.env.SESSION_SECRET;
+const databaseUrl = process.env.DATABASE_URL;
 
 if (!sessionSecret) {
   throw new Error("SESSION_SECRET is missing");
 }
 
+if (!databaseUrl) {
+  throw new Error("DATABASE_URL is missing");
+}
+
+const PostgresSessionStore = connectPgSimple(session);
+
+if (isProduction) {
+  app.set("trust proxy", 1);
+}
+
 app.use(
   session({
+    store: new PostgresSessionStore({
+      conString: databaseUrl,
+      tableName: "sessions",
+    }),
     secret: sessionSecret,
     resave: false,
     saveUninitialized: false,
     cookie: {
       httpOnly: true,
+      secure: isProduction,
       sameSite: "lax",
-      secure: false,
       maxAge: 1000 * 60 * 60 * 24,
     },
   })
@@ -61,8 +80,6 @@ function requireAuth(
   next();
 }
 // middleware，验证用户信息
-const PORT = 3000;
-// 数据写在node.js内存
 
 type TaskForResponse = {
   id: number;
@@ -711,7 +728,21 @@ app.delete("/tasks/:id", requireAuth, async (req, res) => {
   }
 });
 
-app.listen(PORT, () => {
-  console.log(`Server running on http://localhost:${PORT}`);
+const __filename = fileURLToPath(import.meta.url);
+const __dirname = path.dirname(__filename);
+const distPath = path.join(__dirname, "..", "dist");
+
+if (process.env.NODE_ENV === "production") {
+  app.use(express.static(distPath));
+
+  app.get("/{*splat}", (_req, res) => {
+    res.sendFile(path.join(distPath, "index.html"));
+  });
+}
+
+const PORT = Number(process.env.PORT) || 3000;
+
+app.listen(PORT, "0.0.0.0", () => {
+  console.log(`Server is running on port ${PORT}`);
 });
 // 启动服务器

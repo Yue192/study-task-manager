@@ -51,3 +51,11 @@ model users {
   tasks         tasks[]
   courses       courses[]
 }
+
+model sessions {
+  sid    String   @id
+  sess   Json
+  expire DateTime
+
+  @@index([expire])
+}
