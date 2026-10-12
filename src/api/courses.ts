@@ -3,7 +3,7 @@ export type Course = {
   name: string;
 };
 
-const API_URL = "http://localhost:3000";
+const API_URL = "";
 
 async function getErrorMessage(
   response: Response,
